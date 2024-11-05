@@ -19,7 +19,6 @@ def stream():
     # starting the motion live stream
     os.system('motion')
 
-
 # Listening to the user's voice and putting it into a variable
 def listen_voice():
     global audio
@@ -82,4 +81,3 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         destroy()
-
