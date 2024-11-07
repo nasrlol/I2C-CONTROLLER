@@ -1,7 +1,6 @@
 from smbus2 import SMBus
 from time import sleep
 from gpiozero import CPUTemperature
-from rpi_lcd import LCD
 
 import speech_recognition as sr
 import sounddevice
