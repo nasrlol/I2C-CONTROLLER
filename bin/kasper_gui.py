@@ -7,4 +7,5 @@ photo = PhotoImage(file="icon.png")
 display.iconphoto(False, photo)
 
 # making 2 versions IOS AND DESKTOP
+# with swiftUI
 display.mainloop()
