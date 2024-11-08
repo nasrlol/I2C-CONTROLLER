@@ -1,168 +1,138 @@
 from smbus2 import SMBus
-from time import sleep
 from gpiozero import CPUTemperature
 import speech_recognition as sr
-import time
 import os
+import time
 
-ALIGN_FUNC = {"left": "ljust", "right": "rjust", "center": "center"}
-CLEAR_DISPLAY = 0x01
-ENABLE_BIT = 0b00000100
-LINES = {1: 0x80, 2: 0xC0, 3: 0x94, 4: 0xD4}
-
+# LCD Constants
 LCD_BACKLIGHT = 0x08
 LCD_NOBACKLIGHT = 0x00
+ENABLE_BIT = 0b00000100
+LINES = {1: 0x80, 2: 0xC0, 3: 0x94, 4: 0xD4}
+ALIGN_FUNC = {"left": "ljust", "right": "rjust", "center": "center"}
 
-ERROR_BAD_REQUEST = "400"
-ERROR_UNAUTHORIZED = "401"
-ERROR_NOT_FOUND = "404"
-ERROR_TIMEOUT = "408"
+# Error Messages
+ERROR_BAD_REQUEST = "400 Bad Request"
+ERROR_UNAUTHORIZED = "401 Unauthorized"
+ERROR_NOT_FOUND = "404 Not Found"
+ERROR_TIMEOUT = "408 Request Timeout"
 
 
-class LCD(object):
-
+# LCD Control Class
+class LCD:
     def __init__(self, address=0x27, bus=1, width=20, rows=4, backlight=True):
         self.address = address
         self.bus = SMBus(bus)
-        self.delay = 0.0005
-        self.rows = rows
         self.width = width
+        self.rows = rows
         self.backlight_status = backlight
+        self.delay = 0.0005
 
-        self.write(0x33)
-        self.write(0x32)
-        self.write(0x06)
-        self.write(0x0C)
-        self.write(0x28)
-        self.write(CLEAR_DISPLAY)
-        sleep(self.delay)
-
-    def _write_byte(self, byte):
-        self.bus.write_byte(self.address, byte)
-        self.bus.write_byte(self.address, (byte | ENABLE_BIT))
-        sleep(self.delay)
-        self.bus.write_byte(self.address, (byte & ~ENABLE_BIT))
-        sleep(self.delay)
+        # LCD Initialization
+        for cmd in (0x33, 0x32, 0x06, 0x0C, 0x28, 0x01):
+            self.write(cmd)
+            time.sleep(self.delay)
 
     def write(self, byte, mode=0):
-        backlight_mode = LCD_BACKLIGHT if self.backlight_status else LCD_NOBACKLIGHT
-        self._write_byte(mode | ((byte << 4) & 0xF0) | backlight_mode)
+        """Send a command or character to the LCD."""
+        backlight = LCD_BACKLIGHT if self.backlight_status else LCD_NOBACKLIGHT
+        self._write_byte(mode | ((byte << 4) & 0xF0) | backlight)
 
-    def text(self, text, line, align="left"):
+    def _write_byte(self, byte):
+        """Write a byte to the I2C bus."""
+        self.bus.write_byte(self.address, byte)
+        self.bus.write_byte(self.address, (byte | ENABLE_BIT))
+        time.sleep(self.delay)
+        self.bus.write_byte(self.address, (byte & ~ENABLE_BIT))
+        time.sleep(self.delay)
+
+    def display_text(self, text, line=1, align="left"):
+        """Display text on a specified line with alignment."""
         self.write(LINES.get(line, LINES[1]))
-        text, other_lines = self.get_text_line(text)
-        text = getattr(text, ALIGN_FUNC.get(align, "ljust"))(self.width)
-        for char in text:
+        aligned_text = getattr(text, ALIGN_FUNC.get(align, "ljust"))(self.width)
+        for char in aligned_text:
             self.write(ord(char), mode=1)
-        if other_lines and line <= self.rows - 1:
-            self.text(other_lines, line + 1, align=align)
 
-    def backlight(self, turn_on=True):
+    def clear(self):
+        """Clear the display."""
+        self.write(0x01)
+
+    def set_backlight(self, turn_on=True):
+        """Toggle backlight on or off."""
         self.backlight_status = turn_on
         self.write(0)
 
-    def get_text_line(self, text):
-        line_break = self.width
-        if len(text) > self.width:
-            line_break = text[: self.width + 1].rfind(" ")
-        if line_break < 0:
-            line_break = self.width
-        return text[:line_break], text[line_break:].strip()
 
-    def clear(self):
-        self.write(CLEAR_DISPLAY)
+# Initialize components
+lcd = LCD()
+cpu_temp = CPUTemperature()
+recognizer = sr.Recognizer()
+microphone = sr.Microphone()
 
 
-LCD_DISPLAY = LCD()
-VOICE_REC = sr.Recognizer()
-MIC = sr.Microphone()
-PROCES_LOAD = os.getloadavg()
-TIME = time.localtime()
-CURRENT_TIME = time.strftime("%H:%M:%S", TIME)
-UPTIME = time.CLOCK_UPTIME()
-CPU_TEMP = CPUTemperature()
-
-# clearing the lcd from any text that was on it before the program started to ensure smooth operations
-LCD_DISPLAY.clear()
-
-
-# Listening to the user's voice and putting it into a variable
-def listen_voice():
-    global audio
-    with MIC as source:
-        VOICE_REC.adjust_for_ambient_noise(source)
-        audio = VOICE_REC.listen(source)
-    return audio
+# Display Functions
+def display_cpu_info():
+    """Display CPU load and temperature on the LCD."""
+    while True:
+        load = os.getloadavg()[0]  # 1-minute load average
+        temperature = cpu_temp.temperature
+        lcd.clear()
+        lcd.display_text(f"CPU Load: {load:.2f}", line=1)
+        lcd.display_text(f"Temp: {temperature:.1f}C", line=2)
+        time.sleep(5)
 
 
-# Transcribing the audio to text and printing it out
-# Using the Google Speech Recognizer
-def recognize_speech(audio):
+def display_uptime():
+    """Display system uptime on the LCD."""
+    with open("/proc/uptime") as f:
+        uptime_seconds = float(f.readline().split()[0])
+    uptime_str = time.strftime("%H:%M:%S", time.gmtime(uptime_seconds))
+    lcd.clear()
+    lcd.display_text(f"Uptime: {uptime_str}", line=1)
+
+
+def recognize_speech():
+    """Capture and transcribe speech input."""
     try:
-        words = VOICE_REC.recognize_google(audio)
-        LCD_DISPLAY.text(words, 1)
-        print(f"Printing on screen: {words}")
+        with microphone as source:
+            recognizer.adjust_for_ambient_noise(source)
+            print("Listening...")
+            audio = recognizer.listen(source)
+        text = recognizer.recognize_google(audio)
+        lcd.clear()
+        lcd.display_text(text, line=1)
+        print("Speech recognized:", text)
     except sr.UnknownValueError:
-        LCD_DISPLAY.text(ERROR_BAD_REQUEST, 1)
+        lcd.display_text(ERROR_BAD_REQUEST, line=1)
         print(ERROR_BAD_REQUEST)
     except sr.RequestError:
-        LCD_DISPLAY.text(ERROR_UNAUTHORIZED, 1)
+        lcd.display_text(ERROR_UNAUTHORIZED, line=1)
         print(ERROR_UNAUTHORIZED)
 
 
-def CPU_INFO():
-    print("you chose to display the cpou")
+# Main Program Options
+OPTIONS = {
+    "CPU_INFO": display_cpu_info,
+    "UPTIME": display_uptime,
+    "SPEECH_TRANSCRIBER": recognize_speech,
+}
+
+
+def main():
+    # Main program loop to accept user commands.
+    print("WELCOME TO THE I2C COMMAND LINE CENTER")
+    print("Options:", ", ".join(OPTIONS.keys()))
+
     while True:
-        LCD.text(
-            PROCES_LOAD(),
-            1,
-        )
+        user_input = input("Enter command: ").upper()
+        action = OPTIONS.get(user_input)
+
+        if action:
+            action()
+        else:
+            lcd.display_text(ERROR_NOT_FOUND, line=1)
+            print(ERROR_NOT_FOUND)
 
 
-def CPU_LOAD():
-    LCD.backlight_mode = True
-    LCD.text(
-        PROCES_LOAD,
-        1,
-    )
-
-
-def NOTES():
-    count = 0
-    user_notes = input()
-    for i in user_notes:
-        while count < 20:
-            LCD_DISPLAY.text(
-                i,
-                1,
-            )
-            count += 1
-
-
-OPTIONS = [
-    "CPU_CLOCK",
-    "TIME",
-    "UPTIME",
-    "CPU_TEMP",
-    "CPU_LOAD",
-    "NOTES",
-    "SPEECH_TRANSCRIBER",
-]
-
-
-def PROGRAM(USER_INPUT):
-    print("WELCOME TO THE I2C COMMAND LINE CENTER \n WHAT DO YOU WISH TO DO? ")
-    print(OPTIONS)
-
-    FOUND = False
-    while FOUND == False:
-
-        USER_INPUT = input().upper()
-        for i in OPTIONS:
-            if i == USER_INPUT:
-                FOUND = True
-            else:
-                print(ERROR_NOT_FOUND)
-
-
-PROGRAM()
+if __name__ == "__main__":
+    main()
