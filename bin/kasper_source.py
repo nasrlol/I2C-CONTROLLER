@@ -71,6 +71,8 @@ microphone = speech.Microphone()
 
 # Display Functions
 def display_cpu_info():
+    # clearing the display before accessing it 
+    lcd.clear()
     """Display CPU load and temperature on the LCD."""
     while True:
         load = os.getloadavg()[0]  # 1-minute load average
@@ -82,6 +84,8 @@ def display_cpu_info():
 
 
 def display_uptime():
+    # clearing the display before accessing it 
+    lcd.clear()
     """Display system uptime on the LCD."""
     with open("/proc/uptime") as f:
         uptime_seconds = float(f.readline().split()[0])
@@ -91,6 +95,8 @@ def display_uptime():
 
 
 def recognize_speech():
+    # clearing the display before accessing it 
+    lcd.clear()
     """Capture and transcribe speech input."""
     try:
         with microphone as source:
@@ -118,6 +124,8 @@ OPTIONS = {
 
 
 def main():
+    # clearing the display before doing anything
+    lcd.clear()
     # Main program loop to accept user commands.
     print("WELCOME TO THE I2C COMMAND LINE CENTER")
     print("Options:", ", ".join(OPTIONS.keys()))
