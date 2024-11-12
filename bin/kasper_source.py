@@ -3,6 +3,7 @@ from gpiozero import CPUTemperature
 import speech_recognition as speech
 import os
 import time
+from time import sleep
 
 # LCD Constants
 LCD_BACKLIGHT = 0x08
@@ -78,8 +79,8 @@ def display_cpu_info():
         load = os.getloadavg()[0]  # 1-minute load average
         temperature = cpu_temp.temperature
         lcd.clear()
-        lcd.display_text(f"CPU Load: {load:.2f}", line=1)
-        lcd.display_text(f"Temp: {temperature:.1f}C", line=2)
+        lcd.display_text(f"CPU Load: {load:.2f}", 1)
+        lcd.display_text(f"Temp: {temperature:.1f}C", 2)
         time.sleep(5)
 
 
@@ -91,7 +92,7 @@ def display_uptime():
         uptime_seconds = float(f.readline().split()[0])
     uptime_str = time.strftime("%H:%M:%S", time.gmtime(uptime_seconds))
     lcd.clear()
-    lcd.display_text(f"Uptime: {uptime_str}", line=1)
+    lcd.display_text(f"Uptime: {uptime_str}", 1)
 
 
 def recognize_speech():
@@ -105,14 +106,21 @@ def recognize_speech():
             audio = recognizer.listen(source)
         text = recognizer.recognize_google(audio)
         lcd.clear()
-        lcd.display_text(text, line=1)
+        lcd.display_text(text, 1)
         print("Speech recognized:", text)
     except speech.UnknownValueError:
-        lcd.display_text(ERROR_BAD_REQUEST, line=1)
+        lcd.display_text(ERROR_BAD_REQUEST, 1)
         print(ERROR_BAD_REQUEST)
     except speech.RequestError:
-        lcd.display_text(ERROR_UNAUTHORIZED, line=1)
+        lcd.display_text(ERROR_UNAUTHORIZED, 1)
         print(ERROR_UNAUTHORIZED)
+
+def notes():
+    while True:
+        OUTPUT = input()
+        print(OUTPUT)
+        lcd.display_text()
+        sleep(2)
 
 
 # Main Program Options
@@ -120,6 +128,7 @@ OPTIONS = {
     "CPU_INFO": display_cpu_info,
     "UPTIME": display_uptime,
     "SPEECH_TRANSCRIBER": recognize_speech,
+    "NOTES": notes,
 }
 
 
@@ -137,7 +146,7 @@ def main():
         if action:
             action()
         else:
-            lcd.display_text(ERROR_NOT_FOUND, line=1)
+            lcd.display_text(ERROR_NOT_FOUND, 1)
             print(ERROR_NOT_FOUND)
 
 
