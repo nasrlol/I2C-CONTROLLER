@@ -119,7 +119,7 @@ def notes():
     while True:
         OUTPUT = input()
         print(OUTPUT)
-        lcd.display_text()
+        lcd.display_text(OUTPUT, 1)
         sleep(2)
 
 
