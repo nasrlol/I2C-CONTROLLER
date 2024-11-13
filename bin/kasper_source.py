@@ -1,8 +1,9 @@
-from smbus2 import SMBus
+from smbus import SMBus
 from gpiozero import CPUTemperature
-import speech_recognition as sr
+import speech_recognition as speech
 import os
 import time
+from time import sleep
 
 # LCD Constants
 LCD_BACKLIGHT = 0x08
@@ -17,9 +18,9 @@ ERROR_UNAUTHORIZED = "401 Unauthorized"
 ERROR_NOT_FOUND = "404 Not Found"
 ERROR_TIMEOUT = "408 Request Timeout"
 
-
 # LCD Control Class
 class LCD:
+
     def __init__(self, address=0x27, bus=1, width=20, rows=4, backlight=True):
         self.address = address
         self.bus = SMBus(bus)
@@ -62,36 +63,41 @@ class LCD:
         self.backlight_status = turn_on
         self.write(0)
 
-
 # Initialize components
 lcd = LCD()
 cpu_temp = CPUTemperature()
-recognizer = sr.Recognizer()
-microphone = sr.Microphone()
+recognizer = speech.Recognizer()
+microphone = speech.Microphone()
 
 
 # Display Functions
 def display_cpu_info():
+    # clearing the display before accessing it 
+    lcd.clear()
     """Display CPU load and temperature on the LCD."""
     while True:
         load = os.getloadavg()[0]  # 1-minute load average
         temperature = cpu_temp.temperature
         lcd.clear()
-        lcd.display_text(f"CPU Load: {load:.2f}", line=1)
-        lcd.display_text(f"Temp: {temperature:.1f}C", line=2)
+        lcd.display_text(f"CPU Load: {load:.2f}", 1)
+        lcd.display_text(f"Temp: {temperature:.1f}C", 2)
         time.sleep(5)
 
 
 def display_uptime():
+    # clearing the display before accessing it 
+    lcd.clear()
     """Display system uptime on the LCD."""
     with open("/proc/uptime") as f:
         uptime_seconds = float(f.readline().split()[0])
     uptime_str = time.strftime("%H:%M:%S", time.gmtime(uptime_seconds))
     lcd.clear()
-    lcd.display_text(f"Uptime: {uptime_str}", line=1)
+    lcd.display_text(f"Uptime: {uptime_str}", 1)
 
 
 def recognize_speech():
+    # clearing the display before accessing it 
+    lcd.clear()
     """Capture and transcribe speech input."""
     try:
         with microphone as source:
@@ -100,14 +106,21 @@ def recognize_speech():
             audio = recognizer.listen(source)
         text = recognizer.recognize_google(audio)
         lcd.clear()
-        lcd.display_text(text, line=1)
+        lcd.display_text(text, 1)
         print("Speech recognized:", text)
-    except sr.UnknownValueError:
-        lcd.display_text(ERROR_BAD_REQUEST, line=1)
+    except speech.UnknownValueError:
+        lcd.display_text(ERROR_BAD_REQUEST, 1)
         print(ERROR_BAD_REQUEST)
-    except sr.RequestError:
-        lcd.display_text(ERROR_UNAUTHORIZED, line=1)
+    except speech.RequestError:
+        lcd.display_text(ERROR_UNAUTHORIZED, 1)
         print(ERROR_UNAUTHORIZED)
+
+def notes():
+    while True:
+        OUTPUT = input()
+        print(OUTPUT)
+        lcd.display_text(OUTPUT, 1)
+        sleep(2)
 
 
 # Main Program Options
@@ -115,10 +128,13 @@ OPTIONS = {
     "CPU_INFO": display_cpu_info,
     "UPTIME": display_uptime,
     "SPEECH_TRANSCRIBER": recognize_speech,
+    "NOTES": notes,
 }
 
 
 def main():
+    # clearing the display before doing anything
+    lcd.clear()
     # Main program loop to accept user commands.
     print("WELCOME TO THE I2C COMMAND LINE CENTER")
     print("Options:", ", ".join(OPTIONS.keys()))
@@ -130,7 +146,7 @@ def main():
         if action:
             action()
         else:
-            lcd.display_text(ERROR_NOT_FOUND, line=1)
+            lcd.display_text(ERROR_NOT_FOUND, 1)
             print(ERROR_NOT_FOUND)
 
 
