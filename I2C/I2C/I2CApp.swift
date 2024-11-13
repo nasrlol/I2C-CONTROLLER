@@ -1,10 +1,3 @@
-//
-//  I2CApp.swift
-//  I2C
-//
-//  Created by nsrddyn on 09/11/2024.
-//
-
 import SwiftUI
 
 @main
