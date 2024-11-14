@@ -1,6 +1,5 @@
 import time
 import os
-import ollama
 import speech_recognition as speech
 import i2c as LCD
 from gpiozero import CPUTemperature
@@ -69,30 +68,9 @@ def save_notes():
                 if OUTPUT == i:
                     PRINT_REQUEST == False
 
-def lama():
-    QUESTION_REQUEST = True
-    while QUESTION_REQUEST == True:
-        QUESTION_REQUEST = input
-        ("do you want to ask a question") == 'yes'
-        if QUESTION_REQUEST == True:
-            USER_QUESTION = input()
-            response = lama.chat(
-                model="llama3.2",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": USER_QUESTION,
-                    },
-                ],
-            )
-            print(response["messages"]["content"])
-        else: 
-            break
-        
 
 
 OPTIONS = {
-    "LAMA": ollama(),
     "CPU_INFO": display_cpu_info(),
     "UPTIME": display_uptime(),
     "SPEECH_TRANSCRIBER": recognize_speech(),
