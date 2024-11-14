@@ -9,9 +9,8 @@ ERROR_UNAUTHORIZED = "401 Unauthorized"
 ERROR_NOT_FOUND = "404 Not Found"
 ERROR_TIMEOUT = "408 Request Timeout"
 
-lcd = LCD()
+lcd = LCD
 cpu_temp = CPUTemperature()
-lama = ollama()
 recognizer = speech.Recognizer()
 microphone = speech.Microphone()
 
