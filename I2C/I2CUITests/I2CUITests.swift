@@ -3,7 +3,6 @@
 //  I2CUITests
 //
 //  Created by nsrddyn on 09/11/2024.
-//
 
 import XCTest
 
