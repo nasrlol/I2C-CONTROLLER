@@ -1,6 +1,7 @@
 import time
 import os
 import speech_recognition as speech
+import sounddevice 
 import i2c as LCD
 from gpiozero import CPUTemperature
 
