@@ -57,11 +57,17 @@ def recognize_speech():
 
 def save_notes():
     print("Type your notes (type 'stop' to exit):")
+    print("Type line=1 or line=2 to print something to a specific line")
     while True:
-        output = input()
+        line = 1
+        output = input(":")
         if output.lower() in ["stop", "break", "quit", "exit"]:
             break
-        lcd_instance.text(output, 1)
+        if output == "line=1":
+            line = 1
+        elif output == "line=2":
+            line = 2
+        lcd_instance.text(output, line)
         time.sleep(2)
 
 

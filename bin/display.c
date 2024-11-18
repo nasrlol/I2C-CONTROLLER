@@ -1,4 +1,7 @@
 #include <gtk/gtk.h>
+#include <stdio.h>
+#include <string.h>
+
 
 static void activate(GtkApplication *app, gpointer user_data) {
     // Create a new application window
