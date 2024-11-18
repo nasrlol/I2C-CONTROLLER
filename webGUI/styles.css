@@ -1,0 +1,32 @@
+body {
+	background-color: rgba(0, 10, 30, 1);
+	text-decoration: none;
+	color: white;
+	font: sans-serif;
+}
+
+body button a {
+	border-radius: 10px;
+	text-decoration: none;
+}
+
+a {
+	text-decoration: none;
+	color: wheat;
+}
+
+.navigation {
+	max-width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.navigation a {
+	display: block;
+
+	background-color: rgba(0, 0, 0, 1);
+	border-radius: 10px;
+	border: none;
+	padding: 10px;
+	min-width: 100px;
+}

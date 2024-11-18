@@ -1,4 +1,4 @@
-from smbus import SMBus
+from smbus2 import SMBus
 from time import sleep
 
 ALIGN_FUNC = {"left": "ljust", "right": "rjust", "center": "center"}
@@ -63,3 +63,6 @@ class LCD(object):
 
     def clear(self):
         self.write(CLEAR_DISPLAY)
+
+    def read(self):
+        self._read_i2c_block_data
