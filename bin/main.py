@@ -22,8 +22,8 @@ def display_cpu_info():
         load = os.getloadavg()[0]
         temperature = cpu_temp.temperature
         lcd_instance.clear()
-        lcd_instance.display_text(f"CPU Load: {load}", 1)
-        lcd_instance.display_text(f"Temp: {temperature:.1f}C", 2)
+        lcd_instance.text(f"CPU Load: {load}", 1)
+        lcd_instance.text(f"Temp: {temperature:.1f}C", 2)
         time.sleep(5)
 
 
@@ -33,7 +33,7 @@ def display_uptime():
         uptime_seconds = float(f.readline().split()[0])
     uptime_str = time.strftime("%H:%M:%S", time.gmtime(uptime_seconds))
     lcd_instance.clear()
-    lcd_instance.display_text(f"Uptime: {uptime_str}", 1, "center")
+    lcd_instance.text(f"Uptime: {uptime_str}", 1, "center")
 
 
 def recognize_speech():
@@ -45,13 +45,13 @@ def recognize_speech():
             audio = recognizer.listen(source)
         text = recognizer.recognize_google(audio)
         lcd_instance.clear()
-        lcd_instance.display_text(text, 1)
+        lcd_instance.text(text, 1)
         print("Speech recognized:", text)
     except speech.UnknownValueError:
-        lcd_instance.display_text(ERROR_BAD_REQUEST, 1)
+        lcd_instance.text(ERROR_BAD_REQUEST, 1)
         print(ERROR_BAD_REQUEST)
     except speech.RequestError:
-        lcd_instance.display_text(ERROR_UNAUTHORIZED, 1)
+        lcd_instance.text(ERROR_UNAUTHORIZED, 1)
         print(ERROR_UNAUTHORIZED)
 
 
@@ -61,7 +61,7 @@ def save_notes():
         output = input()
         if output.lower() in ["stop", "break", "quit", "exit"]:
             break
-        lcd_instance.display_text(output, 1)
+        lcd_instance.text(output, 1)
         time.sleep(2)
 
 
@@ -85,7 +85,7 @@ def main():
         if action:
             action()
         else:
-            lcd_instance.display_text(ERROR_NOT_FOUND, 1)
+            lcd_instance.text(ERROR_NOT_FOUND, 1)
             print(ERROR_NOT_FOUND)
 
 
