@@ -9,6 +9,15 @@ body {
 	padding: 0;
 }
 
+p {
+   text-align: center;
+
+}
+
+h1 {
+    text-align: center;
+} 
+
 a {
 	text-decoration: none;
 	color: wheat;
@@ -22,7 +31,7 @@ a:hover {
 .navigation {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+    align-items: center;
 	padding: 20px 10%;
 	background-color: rgba(0, 0, 0, 0.8);
 	border-bottom: 2px solid white;
@@ -44,10 +53,10 @@ a:hover {
 
 .controls {
 	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
+    flex-direction: row;
+    justify-content: center;
 	gap: 20px;
-	padding: 50px 10%;
+	padding: 20px 10%;
 }
 
 .controls a {

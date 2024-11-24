@@ -1,0 +1,15 @@
+[Unit]
+Description=REST API Server for RPI
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/I2C/bin/main.py
+WorkingDirectory=/home/pi/I2C
+User=nasr
+Group=pi
+Restart=always
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target
+
