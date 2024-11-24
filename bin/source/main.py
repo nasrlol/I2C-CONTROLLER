@@ -1,186 +1,180 @@
 import time
 import os
-import speech_recognition as speech
-import sounddevice
-import hardware_driver as lcd
+import speech_recognition as sr
 from gpiozero import CPUTemperature
+import hardware_driver as lcd
 
+# Error messages
 ERROR_BAD_REQUEST = "400 Bad Request"
 ERROR_UNAUTHORIZED = "401 Unauthorized"
 ERROR_NOT_FOUND = "404 Not Found"
-SPEECH_NOT_RECOGNIZED = "404-1 Speech is not recognized"
+SPEECH_NOT_RECOGNIZED = "404-1 Speech not recognized"
 ERROR_TIMEOUT = "408 Request Timeout"
 
-lcd_instance = lcd.LCD()
-cpu_temp = CPUTemperature()
-recognizer = speech.Recognizer()
-microphone = speech.Microphone()
+# Initialize components
+try:
+    lcd_instance = lcd.LCD()
+except Exception as e:
+    print("Error intializing LCD")
+try:
+    cpu_temp = CPUTemperature()
+except Exception as e:
+    print("Error initializing CPU temperature sensor:", e)
 
+try: 
+    recognizer = sr.Recognizer()
+except Exception as e:
+    print("Error initialzing voice recognition, its possible the speech recognition module isn't installed")
 
-# greeting that starts upon the boot of the device:
-# shows a hello line; shorter than 16 chars
-# and some small information on the second line
+try:
+    microphone = sr.Microphone()
+except Exception as e:
+    print("Error initialzing the microphone \n check if the sound device package is installed")
+
+# clearing the terminal for a cleaner and program like interaction
+def clear_terminal():
+    os.system("cls" if os.name == "nt" else "clear")
+
+# Features
 def custom_greeting():
-    with open("quotes.txt", "r") as file:
-        quotes = file.readlines()
+    try:
+        with open("quotes.txt", "r") as file:
+            quotes = [quote.strip() for quote in file.readlines()]
+    except FileNotFoundError:
+        lcd_instance.text("Quotes file missing", 1)
+        return
 
-    # Strip newline characters and use the quotes
-    quotes = [quote.strip() for quote in quotes]
-
-    # Print the quotes
     for quote in quotes:
-        print(quote)
-        first_line = ""
-        second_line = ""
-        count = 0
-        for i in quote:
-            if count < 16:
-                first_line += i
-                count += 1
-            else:
-                second_line += i
-        lcd.text(first_line, 1)
-        lcd.text(second_line, 2)
-
+        first_line = quote[:16]
+        second_line = quote[16:32]
+        lcd_instance.text(first_line, 1)
+        lcd_instance.text(second_line, 2)
+        time.sleep(3)
+    lcd_instance.clear()
 
 def pomodoro():
-    time = input("How long do you want to wait? : ")
-    print("Okay \nStarting Now...")
-    while time > 0:
-        time.sleep(1)
-        print(time + "Seconds")
-        lcd.text(time + " Seconds remaining...", 1)
-        time -= 1
+    try:
+        duration_minutes = int(input("Enter duration in minutes: "))
+        duration_seconds = duration_minutes * 60
+        print("Pomodoro started for", duration_minutes, "minutes")
+        lcd_instance.text("Pomodoro Running", 1)
+        start_count = 0
+        count = 0
+        while duration_seconds > 0:
+            lcd_instance.text(f"Time left: {duration_minutes}:{duration_seconds * 60}", 2)
+            time.sleep(1)
+            duration_seconds -= 1
+            count += 1
+            if count == start_count + 60:
+                start_count = start
+                duration_minutes -= 1
 
+        lcd_instance.text("Time's Up!", 1)
+        time.sleep(3)
+    except ValueError:
+        lcd_instance.text("Invalid input", 1)
+        time.sleep(2)
 
-def weather():
-    pass
-
-
-# ram usage, internet speed,
 def system_readings():
-    lcd_instance.clear()
     while True:
         load = os.getloadavg()[0]
-        temperature = cpu_temp.temperature
+        temperature = cpu_temp.temperature if cpu_temp else "N/A"
         lcd_instance.clear()
-        lcd_instance.text(f"CPU Load: {load}", 1)
-        lcd_instance.text(f"Temp: {temperature:.1f}C", 2)
+        lcd_instance.text(f"CPU Load: {load:.2f}", 1)
+        lcd_instance.text(f"Temp: {temperature}C", 2)
         time.sleep(5)
 
-
 def display_uptime():
-    lcd_instance.clear()
-    with open("/proc/uptime") as f:
-        uptime_seconds = float(f.readline().split()[0])
-    uptime_str = time.strftime("%H:%M:%S", time.gmtime(uptime_seconds))
-    lcd_instance.clear()
-    lcd_instance.text(f"Uptime: {uptime_str}", 1, "center")
-
+    try:
+        with open("/proc/uptime") as f:
+            uptime_seconds = float(f.readline().split()[0])
+        uptime_str = time.strftime("%H:%M:%S", time.gmtime(uptime_seconds))
+        lcd_instance.text(f"Uptime: {uptime_str}", 1)
+        time.sleep(3)
+    except Exception as e:
+        lcd_instance.text("Error reading uptime", 1)
+        print("Error:", e)
 
 def recognize_speech():
-
-    lcd_instance.clear()
+    lcd_instance.text("Listening...", 1)
     try:
         with microphone as source:
             recognizer.adjust_for_ambient_noise(source)
-            print("Listening...")
             audio = recognizer.listen(source)
-        text = recognizer.recognize_google(audio)
-        lcd_instance.clear()
-        lcd_instance.text(text, 1)
+        output = recognizer.recognize_google(audio)
+        lcd_instance.text("Recognized:", 1)
+        lcd_instance.text(output[:16], 2)
 
-        print("Speech recognized:", text)
-    except speech.UnknownValueError:
-        lcd_instance.text(ERROR_BAD_REQUEST, 1)
-        print(ERROR_BAD_REQUEST)
-    except speech.RequestError:
+        print("Speech recognized:", output)
+        return output
+    except sr.UnknownValueError:
+        lcd_instance.text(SPEECH_NOT_RECOGNIZED, 1)
+        print(SPEECH_NOT_RECOGNIZED)
+    except sr.RequestError as e:
         lcd_instance.text(ERROR_UNAUTHORIZED, 1)
-        print(ERROR_UNAUTHORIZED)
-
-    return text
-
+        print(ERROR_UNAUTHORIZED, e)
+    except Exception as e:
+        lcd_instance.text("Speech Error", 1)
+        print("Error:", e)
+    return None
 
 def save_notes():
     print("Type your notes (type 'stop' to exit):")
-    print("Type line=1 or line=2 to print something to a specific line")
     while True:
-        line = 1
-        output = input(":")
-        output_length = len(output)
-        if output.lower() in ["stop", "break", "quit", "exit"]:
+        note = input(": ")
+        if note.lower() in ["stop", "exit", "quit"]:
             break
-        if output == "line=1":
-            line = 1
-        elif output == "line=2":
-            line = 2
+        first_line = note[:16]
+        second_line = note[16:32]
+        lcd_instance.text(first_line, 1)
+        lcd_instance.text(second_line, 2)
+        time.sleep(3)
 
-        if output_length < 16:
-            lcd_instance.text(output, line)
-            time.sleep(2)
-        else:
-            output_list = output.split("")
-            first_line = ""
-            second_line = ""
-            for i in output_list:
-                count = 0
-                if count > 16:
-                    first_line += output_list[i]
-                    count += 1
-                else:
-                    second_line += output_list[i]
-        lcd.text(first_line, 1)
-        lcd.text(secon_line, 2)
+# Command center to execute features
+def command_center():
+    command = recognize_speech().upper()
+    if command:
+        command()
+    else:
+        lcd_instance.text(ERROR_NOT_FOUND, 1)
+        print(ERROR_NOT_FOUND)
 
-
-def command_center(commands):
-    # checking if we can reconize commands within the user speech
-    # requires ->
-    # converting the commands to human readable text
-    # no under scars
-    command = recognize_speech()
-    list = []
-    try:
-        for i in commands:
-            if i == command:
-                print("I think i found what you ment...")
-                command()
-    except:
-        print("ERROR 404 - COMMAND NOT RECOGNIZED")
-
-
+# Features dictionary
 FEATURES = {
-    "READINGS": system_readings,
-    "UPTIME": display_uptime,
-    "SPEECH_TRANSCRIBER": recognize_speech,
-    "NOTES": save_notes,
-    "COMMAND CENTER": command_center,
-}
+        "GREETING": custom_greeting,
+        "READINGS": system_readings,
+        "UPTIME": display_uptime,
+        "SPEECH": recognize_speech,
+        "NOTE": save_notes,
+        "COMMAND": command_center,
+        "POMODORO": pomodoro,
+        }
 
-
+# Main Menu
 def main():
-    lcd_instance.clear()
-    os.system("cls" if os.name == "nt" else "clear")
+    clear_terminal()
     print("FEATURES:", ", ".join(FEATURES.keys()))
-
     while True:
-        user_input = input("Enter command: ").upper()
+        user_input = input("Enter command (or 'EXIT' to quit): ").upper()
+        if user_input in ["QUIT", "EXIT"]:
+            destroy()
+            break
         action = FEATURES.get(user_input)
-
         if action:
             action()
         else:
-            lcd_instance.text(ERROR_NOT_FOUND, 1)
             print(ERROR_NOT_FOUND)
 
-
+# Clean up on exit
 def destroy():
     lcd_instance.clear()
-    os.system("cls" if os.name == "nt" else "clear")
+    clear_terminal()
+    print("Goodbye!")
 
-
+# Entry point
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
         destroy()
+
