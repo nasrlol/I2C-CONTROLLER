@@ -10,7 +10,6 @@ This is a starter project with the goal of expanded everything later on to let's
 The program is Multi-platform and even supports a web-console
 
 MAIN USE OF THE PROGRAM : 
-
 the main feature of the program is the ability to control and I2C display really extensivly and be abel to do alot of things with it
 
 CURRENT FEATURES -> 
@@ -27,4 +26,4 @@ CURRENT FEATURES ->
 * to do list integration based on the personal calender
 
 
-A nice idea is to make it somehting easily installabled and configurable in the future without to much tinkering need
+A nice idea is to make it somehting easily installable and configurable in the future without to much tinkering need
