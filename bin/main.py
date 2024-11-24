@@ -21,7 +21,7 @@ microphone = speech.Microphone()
 # shows a hello line; shorter than 16 chars
 # and some small information on the second line
 def custom_greeting():
-    with open('quotes.txt', 'r') as file:
+    with open("quotes.txt", "r") as file:
         quotes = file.readlines()
 
     # Strip newline characters and use the quotes
@@ -37,10 +37,12 @@ def custom_greeting():
             if count < 16:
                 first_line += i
                 count += 1
-            else:  
+            else:
                 second_line += i
-        lcd.text(first_line,1)
-        lcd.text(secon_line,2)
+        lcd.text(first_line, 1)
+        lcd.text(second_line, 2)
+
+
 def pomodoro():
     time = input("How long do you want to wait? : ")
     print("Okay \nStarting Now...")
@@ -50,7 +52,7 @@ def pomodoro():
         lcd.text(time + " Seconds remaining...", 1)
         time -= 1
 
-    
+
 def weather():
     pass
 
@@ -127,8 +129,9 @@ def save_notes():
                     count += 1
                 else:
                     second_line += output_list[i]
-        lcd.text(first_line,1)
-        lcd.text(secon_line,2)
+        lcd.text(first_line, 1)
+        lcd.text(secon_line, 2)
+
 
 def command_center(commands):
     # checking if we can reconize commands within the user speech
@@ -147,12 +150,12 @@ def command_center(commands):
 
 
 FEATURES = {
-        "READINGS": system_readings,
-        "UPTIME": display_uptime,
-        "SPEECH_TRANSCRIBER": recognize_speech,
-        "NOTES": save_notes,
-        "COMMAND CENTER": command_center,
-        }
+    "READINGS": system_readings,
+    "UPTIME": display_uptime,
+    "SPEECH_TRANSCRIBER": recognize_speech,
+    "NOTES": save_notes,
+    "COMMAND CENTER": command_center,
+}
 
 
 def main():
