@@ -2,7 +2,7 @@ import time
 import os
 import speech_recognition as speech
 import sounddevice
-import bin.hardware_driver as lcd
+import hardware_driver as lcd
 from gpiozero import CPUTemperature
 
 ERROR_BAD_REQUEST = "400 Bad Request"
