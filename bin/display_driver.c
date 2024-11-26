@@ -29,7 +29,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     for (int i = 0; i < features_count; i++) {
         GtkWidget *button = gtk_button_new_with_label(features[i]);
         gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
-        gtk_widget_set_size_request(button, 200, 100);
+        gtk_widget_set_size_request(button, 50, 50);
     }
 
     // Show all widgets
