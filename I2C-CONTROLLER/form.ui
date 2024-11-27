@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GUI</class>
+ <widget class="QMainWindow" name="GUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="cursor">
+   <cursorShape>CrossCursor</cursorShape>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">LCD1602</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../assets/icons/LCD1602.png</normaloff>../assets/icons/LCD1602.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <widget class="QLCDNumber" name="LCD1602EMULATION">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>570</y>
+      <width>341</width>
+      <height>191</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
