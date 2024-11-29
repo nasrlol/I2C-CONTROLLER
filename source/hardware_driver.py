@@ -124,6 +124,9 @@ def custom_greeting():
         time.sleep(3)
     lcd_instance.clear()
 
+def joke_of_the_day():
+    pass
+
 def pomodoro():
     try:
         duration_minutes = int(input("Enter duration in minutes: "))
