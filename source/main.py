@@ -8,12 +8,12 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 from PySide6.QtCore import Qt
-import hardware_driver as LCD
+import hardware_driver as lcd
 import features as fe
 import sys
 
 F = fe()
-L = LCD()
+L = lcd.LCD()
 
 
 class mainWindow(QMainWindow):
