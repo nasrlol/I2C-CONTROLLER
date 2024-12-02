@@ -40,7 +40,6 @@ class fe:
     def __init__(self):
         self.clear_terminal = clear_terminal()
         self.custom_greeting = custom_greeting()
-        self.joke_of_the_day = joke_of_the_day()
         self.pomodoro = pomodoro()
         self.system_readings = system_readings()
         self.display_uptime = display_uptime()
@@ -49,11 +48,11 @@ class fe:
         self.command_center = command_center()
 
     # clearing the terminal for a cleaner and program like interaction
-    def clear_terminal():
+    def clear_terminal(self):
         os.system("cls" if os.name == "nt" else "clear")
 
     # Features
-    def custom_greeting():
+    def custom_greeting(self):
         try:
             with open("quotes.txt", "r") as file:
                 quotes = [quote.strip() for quote in file.readlines()]
@@ -69,10 +68,8 @@ class fe:
             time.sleep(3)
         lcd_instance.clear()
 
-    def joke_of_the_day():
-        pass
 
-    def pomodoro():
+    def pomodoro(self):
         try:
             duration_minutes = int(input("Enter duration in minutes: "))
             duration_seconds = duration_minutes * 60
@@ -97,7 +94,7 @@ class fe:
             lcd_instance.text("Invalid input", 1)
             time.sleep(2)
 
-    def system_readings():
+    def system_readings(self):
         while True:
             load = os.getloadavg()[0]
             temperature = cpu_temp.temperature if cpu_temp else "N/A"
@@ -106,7 +103,7 @@ class fe:
             lcd_instance.text(f"Temp: {temperature}C", 2)
             time.sleep(5)
 
-    def display_uptime():
+    def display_uptime(self):
         try:
             with open("/proc/uptime") as f:
                 uptime_seconds = float(f.readline().split()[0])
@@ -117,7 +114,7 @@ class fe:
             lcd_instance.text("Error reading uptime", 1)
             print("Error:", e)
 
-    def recognize_speech():
+    def recognize_speech(self):
         lcd_instance.text("Listening...", 1)
         try:
             with microphone as source:
@@ -140,7 +137,7 @@ class fe:
             print("Error:", e)
         return None
 
-    def save_notes():
+    def save_notes(self):
         print("Type your notes (type 'stop' to exit):")
         while True:
             note = input(": ")
@@ -153,10 +150,10 @@ class fe:
             time.sleep(3)
 
     # Command center to execute features
-    def command_center():
+    def command_center(self):
         command = recognize_speech().upper()
         if command:
-            command()
+            self.command_center()
         else:
             lcd_instance.text(ERROR_NOT_FOUND, 1)
             print(ERROR_NOT_FOUND)
