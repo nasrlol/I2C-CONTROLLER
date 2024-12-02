@@ -52,7 +52,7 @@ except Exception as e:
     microphone_available = 0
 
 
-class fe:
+class feat:
 
     def __init__(self):
         pass

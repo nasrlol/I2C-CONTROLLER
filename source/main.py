@@ -3,16 +3,16 @@ from PySide6.QtWidgets import (
     QLabel,
     QMainWindow,
     QPushButton,
-    QLabel,
     QVBoxLayout,
     QWidget,
 )
+
 from PySide6.QtCore import Qt
 import hardware_driver as lcd
 import features as fe
 import sys
 
-F = fe()
+F = fe.feat()
 L = lcd.LCD()
 
 
