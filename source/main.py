@@ -14,7 +14,6 @@ import sys
 
 L = lcd()
 
-
 class mainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -39,7 +38,7 @@ class mainWindow(QMainWindow):
         central_widget.setLayout(layout)
 
     def clear_screen():
-        lcd.clear()
+        L.clear()
         self.label.setText("Cleared the LCD screen", self)
 
 
