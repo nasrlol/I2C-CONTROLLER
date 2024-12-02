@@ -8,11 +8,13 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 from PySide6.QtCore import Qt
-import hardware_driver as lcd
+import hardware_driver as LCD
+import features as fe
 import sys
 
+F = fe()
+L = LCD()
 
-L = lcd()
 
 class mainWindow(QMainWindow):
     def __init__(self):
@@ -38,7 +40,7 @@ class mainWindow(QMainWindow):
         central_widget.setLayout(layout)
 
     def clear_screen():
-        L.clear()
+        fe.clear()
         self.label.setText("Cleared the LCD screen", self)
 
 
