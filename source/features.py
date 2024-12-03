@@ -19,7 +19,7 @@ ERROR_TIMEOUT = "the request took too long check youre internet connection"
 # try initializingthe lcd
 # if initializations fail they should disale they're function
 
-lcd_instance = lcd.LCD()
+L = lcd.LCD()
 
 # try initializing the temperature readings
 try:
@@ -66,16 +66,16 @@ class feat:
             with open("quotes.txt", "r") as file:
                 quotes = [quote.strip() for quote in file.readlines()]
         except FileNotFoundError:
-            lcd_instance.text("Quotes file missing", 1)
+            L.text("Quotes file missing", 1)
             return
 
         for quote in quotes:
             first_line = quote[:16]
             second_line = quote[16:32]
-            lcd_instance.text(first_line, 1)
-            lcd_instance.text(second_line, 2)
+            L.text(first_line, 1)
+            L.text(second_line, 2)
             time.sleep(3)
-        lcd_instance.clear()
+        L.clear()
 
     def pomodoro(self):
 
@@ -98,13 +98,11 @@ class feat:
                     duration_minutes -= 1
                     time_passed_seconds == 0
                 print(f"\ryou have {duration_minutes}:{duration_seconds} left", end="")
-                lcd_instance.text(
-                    f"\ryou have {duration_minutes}:{duration_seconds} left", 1
-                )
+                L.text(f"\ryou have {duration_minutes}:{duration_seconds} left", 1)
                 sleep(1)
 
         except ValueError:
-            lcd_instance.text("Invalid input", 1)
+            L.text("Invalid input", 1)
             time.sleep(2)
 
     def temperature(self):
@@ -112,9 +110,9 @@ class feat:
         while True:
             load = os.getloadavg()[0]
             temperature = cpu_temp.temperature if cpu_temp else "N/A"
-            lcd_instance.clear()
-            lcd_instance.text(f"CPU Load: {load:.2f}", 1)
-            lcd_instance.text(f"Temp: {temperature}C", 2)
+            L.clear()
+            L.text(f"CPU Load: {load:.2f}", 1)
+            L.text(f"Temp: {temperature}C", 2)
             time.sleep(5)
 
     def display_uptime(self):
@@ -123,34 +121,34 @@ class feat:
             with open("/proc/uptime") as f:
                 uptime_seconds = float(f.readline().split()[0])
             uptime_str = time.strftime("%H:%M:%S", time.gmtime(uptime_seconds))
-            lcd_instance.text(f"Uptime: {uptime_str}", 1)
+            L.text(f"Uptime: {uptime_str}", 1)
             time.sleep(3)
         except Exception as e:
-            lcd_instance.text("Error reading uptime", 1)
+            L.text("Error reading uptime", 1)
             print("Error:", e)
 
     def recognize_speech(self, recognizer_):
         self.clear_terminal_lcd()
 
-        lcd_instance.text("Listening...", 1)
+        L.text("Listening...", 1)
         try:
             with microphone as source:
                 recognizer.adjust_for_ambient_noise(source)
                 audio = recognizer.listen(source)
             output = recognizer.recognize_google(audio)
-            lcd_instance.text("Recognized:", 1)
-            lcd_instance.text(output[:16], 2)
+            L.text("Recognized:", 1)
+            L.text(output[:16], 2)
 
             print("Speech recognized:", output)
             return output
         except sr.UnknownValueError:
-            lcd_instance.text(SPEECH_NOT_RECOGNIZED, 1)
+            L.text(SPEECH_NOT_RECOGNIZED, 1)
             print(SPEECH_NOT_RECOGNIZED)
         except sr.RequestError as e:
-            lcd_instance.text(ERROR_UNAUTHORIZED, 1)
+            L.text(ERROR_UNAUTHORIZED, 1)
             print(ERROR_UNAUTHORIZED, e)
         except Exception as e:
-            lcd_instance.text("Speech Error", 1)
+            L.text("Speech Error", 1)
             print("Error:", e)
         return None
 
@@ -163,8 +161,8 @@ class feat:
                 break
             first_line = note[:16]
             second_line = note[16:32]
-            lcd_instance.text(first_line, 1)
-            lcd_instance.text(second_line, 2)
+            L.text(first_line, 1)
+            L.text(second_line, 2)
             time.sleep(3)
 
     # Command center to execute features
@@ -184,5 +182,5 @@ class feat:
         elif command == "temperature":
             self.temperature()
         else:
-            lcd_instance.text(ERROR_NOT_FOUND, 1)
+            L.text(ERROR_NOT_FOUND, 1)
             print(ERROR_NOT_FOUND)
