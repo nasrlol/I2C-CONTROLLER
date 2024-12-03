@@ -2,6 +2,7 @@ import time
 import os
 import speech_recognition as sr
 from gpiozero import CPUTemperature
+import hardware_driver as lcd  # importing the ./hardware_driver.py file
 
 # some functions need to be put on a different thread but we are keeping that project for another time
 # import threading
