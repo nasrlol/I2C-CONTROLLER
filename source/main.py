@@ -11,8 +11,8 @@ import hardware_driver as lcd
 import features as fe
 import sys
 
-F = fe.feat()  # Assuming 'feat' is a class in your 'features' module
-L = lcd.LCD()  # Assuming 'LCD' is a class in your 'hardware_driver' module
+F = fe.feat()  
+L = lcd.LCD()  
 
 
 class mainWindow(QMainWindow):
@@ -23,7 +23,7 @@ class mainWindow(QMainWindow):
         self.mainUI()
 
     def mainUI(self):
-        central_widget = QWidget(self)  # Fixed variable name (capital 'C' to lowercase)
+        central_widget = QWidget(self) 
         self.setCentralWidget(central_widget)
 
         self.label = QLabel("CONNECTED TO I2C DEVICE", self)
@@ -38,9 +38,9 @@ class mainWindow(QMainWindow):
 
         central_widget.setLayout(layout)
 
-    def clear_screen(self):  # Added 'self' as the first argument
-        F.clear()  # Call the clear method from 'feat' object
-        self.label.setText("Cleared the LCD screen")  # Update the label text
+    def clear_screen(self):  
+        F.clear()  
+        self.label.setText("Cleared the LCD screen")  
 
 
 if __name__ == "__main__":
