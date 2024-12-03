@@ -16,12 +16,9 @@ ERROR_TIMEOUT = "the request took too long check youre internet connection"
 
 # Initialize components and error handling for debugging
 # try initializingthe lcd
-# if initializations fail they should disale theyre function
-try:
-    lcd_instance = lcd.LCD()
-except Exception as e:
-    print("Error intializing LCD \n exiting the application...")
-    exit()
+# if initializations fail they should disale they're function
+
+lcd_instance = lcd.LCD()
 
 # try initializing the temperature readings
 try:
