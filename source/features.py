@@ -24,30 +24,29 @@ lcd_instance = lcd.LCD()
 # try initializing the temperature readings
 try:
     cpu_temp = CPUTemperature()
-    temperature_available = 1
+
 except Exception as e:
     print("Error initializing CPU temperature sensor:", e)
-    temperature_available = 0
+
 
 # try initializing the google speech recognizer
 try:
     recognizer = sr.Recognizer()
-    recognizer_available = 1
+
 except Exception as e:
     print(
         "Error initialzing voice recognition, its possible the speech recognition module isn't installed"
     )
-    recognizer_available = 0
+
 
 # try initializing the microphone
 try:
     microphone = sr.Microphone()
-    microphone_available = 1
+
 except Exception as e:
     print(
         "Error initialzing the microphone \n check if the sound device package is installed"
     )
-    microphone_available = 0
 
 
 class feat:
@@ -108,20 +107,15 @@ class feat:
             lcd_instance.text("Invalid input", 1)
             time.sleep(2)
 
-    def temperature(self, temperature_available):
-
+    def temperature(self):
         self.clear_terminal_lcd()
-
-        if temperature_available == 0:
-            print(ERROR_NOT_FOUND)
-        else:
-            while True:
-                load = os.getloadavg()[0]
-                temperature = cpu_temp.temperature if cpu_temp else "N/A"
-                lcd_instance.clear()
-                lcd_instance.text(f"CPU Load: {load:.2f}", 1)
-                lcd_instance.text(f"Temp: {temperature}C", 2)
-                time.sleep(5)
+        while True:
+            load = os.getloadavg()[0]
+            temperature = cpu_temp.temperature if cpu_temp else "N/A"
+            lcd_instance.clear()
+            lcd_instance.text(f"CPU Load: {load:.2f}", 1)
+            lcd_instance.text(f"Temp: {temperature}C", 2)
+            time.sleep(5)
 
     def display_uptime(self):
         self.clear_terminal_lcd()
@@ -135,33 +129,30 @@ class feat:
             lcd_instance.text("Error reading uptime", 1)
             print("Error:", e)
 
-    def recognize_speech(self, recognizer_available):
+    def recognize_speech(self, recognizer_):
         self.clear_terminal_lcd()
-        if recognizer_available == 0 or microphone_available == 0:
-            print(ERROR_NOT_FOUND)
-        else:
 
-            lcd_instance.text("Listening...", 1)
-            try:
-                with microphone as source:
-                    recognizer.adjust_for_ambient_noise(source)
-                    audio = recognizer.listen(source)
-                output = recognizer.recognize_google(audio)
-                lcd_instance.text("Recognized:", 1)
-                lcd_instance.text(output[:16], 2)
+        lcd_instance.text("Listening...", 1)
+        try:
+            with microphone as source:
+                recognizer.adjust_for_ambient_noise(source)
+                audio = recognizer.listen(source)
+            output = recognizer.recognize_google(audio)
+            lcd_instance.text("Recognized:", 1)
+            lcd_instance.text(output[:16], 2)
 
-                print("Speech recognized:", output)
-                return output
-            except sr.UnknownValueError:
-                lcd_instance.text(SPEECH_NOT_RECOGNIZED, 1)
-                print(SPEECH_NOT_RECOGNIZED)
-            except sr.RequestError as e:
-                lcd_instance.text(ERROR_UNAUTHORIZED, 1)
-                print(ERROR_UNAUTHORIZED, e)
-            except Exception as e:
-                lcd_instance.text("Speech Error", 1)
-                print("Error:", e)
-            return None
+            print("Speech recognized:", output)
+            return output
+        except sr.UnknownValueError:
+            lcd_instance.text(SPEECH_NOT_RECOGNIZED, 1)
+            print(SPEECH_NOT_RECOGNIZED)
+        except sr.RequestError as e:
+            lcd_instance.text(ERROR_UNAUTHORIZED, 1)
+            print(ERROR_UNAUTHORIZED, e)
+        except Exception as e:
+            lcd_instance.text("Speech Error", 1)
+            print("Error:", e)
+        return None
 
     def save_notes(self):
         self.clear_terminal_lcd()
