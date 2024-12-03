@@ -56,7 +56,7 @@ class feat:
 
     # clearing the terminal for a cleaner and program like interaction
     def clear_terminal_lcd(self):
-        lcd.instance.clear()
+        L.clear()
         os.system("cls" if os.name == "nt" else "clear")
 
     # Features
