@@ -3,7 +3,6 @@ import os
 import speech_recognition as sr
 from gpiozero import CPUTemperature
 import hardware_driver as lcd  # importing the ./hardware_driver.py file
-from main_cli import input_handling
 
 # some functions need to be put on a different thread but we are keeping that project for another time
 # import threading
@@ -153,11 +152,11 @@ class feat:
             print("Error:", e)
         return None
 
-    def save_notes(self, input_handling):
+    def save_notes(self, input):
         self.clear_terminal_lcd()
         print("Type your notes (type 'stop' to exit):")
         while True:
-            note = input_handling(": ")
+            note = input
             if note.lower() in ["stop", "exit", "quit"]:
                 break
             first_line = note[:16]
