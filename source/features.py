@@ -127,7 +127,7 @@ class feat:
             L.text("Error reading uptime", 1)
             print("Error:", e)
 
-    def recognize_speech(self, recognizer_):
+    def recognize_speech(self):
         self.clear_terminal_lcd()
 
         L.text("Listening...", 1)
