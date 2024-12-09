@@ -98,6 +98,14 @@ def draw_menu(stdscr):
             break  # Exit the while loop and terminate the program
 
 
+def input_handling():
+    while True:
+        key = stdscr.getkey()
+        stdcr.addstr(f"key: {key}")
+        stdcr.refresh()
+        stdcr.getch()
+
+
 def main():
     """
     The main function wraps the curses functionality and runs the application.
