@@ -29,11 +29,11 @@ At the moment the software only supports a CLI version.
 
 Support wil be kept to Linux and MacOS for now.
 
----
+<center>---
 
                      I2C CONTROLLER GUIDE
 
----
+</center>---
 
 This program is designed to control an LCD1602 using python. It supports
 a GUI and CLI interface and is at the moment only linux compatible.
